@@ -10,10 +10,11 @@ room’s availability, book or cancel a reservation through an API.
 ```bash
 git clone ...
 cd path/to/project
+python3 -m venv env
 source env/bin/activate
 pip install -r requirements.txt
 cd apps
-python3 manage.py migrate
+python manage.py migrate
 deactivate
 ```
 
@@ -22,7 +23,7 @@ deactivate
 ```bash
 source env/bin/activate
 cd apps
-python -Wa ./manage.py test
+python -Wa manage.py test
 ```
 
 ## Usage
@@ -31,7 +32,7 @@ Run test server on a local machine:
 ```bash
 source env/bin/activate
 cd apps
-#create superuser:
+#create superuser, use '1' as a password:
 python manage.py createsuperuser --username super --email super@gmail.com
 #run server:
 python manage.py runserver 8000
