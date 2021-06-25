@@ -13,24 +13,37 @@ class ReservationSerializer(serializers.ModelSerializer):
         model = Reservation
         fields = '__all__'
 
-class RoomSerializer(serializers.HyperlinkedModelSerializer):
-    reservations = serializers.HyperlinkedRelatedField(
-        many=True,
-        view_name='reservation-detail',
-        read_only=True,
-    )
+class RoomDetailSerializer(serializers.HyperlinkedModelSerializer):
+    reservations = ReservationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Room
         fields = ('id', 'title', 'description', 'reservations')
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class RoomListSerializer(RoomDetailSerializer):
     reservations = serializers.HyperlinkedRelatedField(
         many=True,
         view_name='reservation-detail',
         read_only=True,
     )
 
+
+class UserDetailSerializer(serializers.HyperlinkedModelSerializer):
+    reservations = ReservationSerializer(many=True, read_only=True)
+    owned_reservations = ReservationSerializer(many=True, read_only=True)
+
     class Meta:
         model = User
         fields = ('id', 'username', 'owned_reservations', 'reservations')
+
+class UserListSerializer(UserDetailSerializer):
+    reservations = serializers.HyperlinkedRelatedField(
+        many=True,
+        view_name='reservation-detail',
+        read_only=True,
+    )
+    owned_reservations = serializers.HyperlinkedRelatedField(
+        many=True,
+        view_name='reservation-detail',
+        read_only=True,
+    )

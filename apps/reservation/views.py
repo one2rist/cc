@@ -12,8 +12,8 @@ from reservation.models import Reservation
 from reservation.models import Room
 from reservation.permissions import IsOwnerOrReadOnly, IsSuperOrReadOnly
 from reservation.serializers import ReservationSerializer
-from reservation.serializers import UserSerializer
-from reservation.serializers import RoomSerializer
+from reservation.serializers import UserListSerializer, UserDetailSerializer
+from reservation.serializers import RoomDetailSerializer, RoomListSerializer
 
 
 
@@ -28,8 +28,9 @@ def home(request, format=None):
 class ReservationList(generics.ListCreateAPIView):
     """
     List all reservations:
-    curl -H "Content-type: application/json" http://127.0.0.1:8000/reservation/
-    http http://127.0.0.1:8000/reservation/ Accept:application/json
+    Authenticated user: can Create
+    All: can Read
+    on Create: validates overlapping (Start-End) with existing reservations
     """
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
@@ -49,14 +50,17 @@ class ReservationList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         if self._conflicting(serializer.validated_data):
-            raise ValidationError('This time slot is alredy taken.')
+            raise ValidationError(
+                'This time slot is alredy taken for the Room.'
+            )
         serializer.save(organizer=self.request.user)
 
 class ReservationDetail(generics.RetrieveUpdateDestroyAPIView):
     """
-    Retrieve, update or delete a reservation.
-    Update (PUT):
-    http --json PUT http://127.0.0.1:8000/reservation.json title="One more res"
+    Reservation details:
+    Authenticated Organizer: can Update/Delete
+    All: can Read
+    on Update: validates overlapping (Start-End) with existing reservations
     """
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
@@ -66,7 +70,7 @@ class ReservationDetail(generics.RetrieveUpdateDestroyAPIView):
         instance = self.get_object()
         start = data.get('start', instance.start)
         end = data.get('end', instance.end)
-        room = data.get('room', instance.room.pk)
+        room = data.get('room', instance.room)
         return Reservation.objects.filter(
             start__lt=end,
             end__gt=start,
@@ -77,24 +81,42 @@ class ReservationDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def perform_update(self, serializer):
         if self._conflicting(serializer.validated_data):
-            raise ValidationError('This time slot is alredy taken.')
+            raise ValidationError(
+                'This time slot is alredy taken for the Room.'
+            )
         serializer.save()
 
 
 class UserList(generics.ListAPIView):
+    """
+    List of Employees:
+    nested list of Reservations hyperlinks
+    """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserListSerializer
 
 class UserDetail(generics.RetrieveAPIView):
+    """
+    Employee details:
+    nested list of Reservations details
+    """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailSerializer
 
 class RoomList(generics.ListCreateAPIView):
+    """
+    List of Rooms:
+    nested list of Reservations hyperlinks
+    """
     queryset = Room.objects.all()
-    serializer_class = RoomSerializer
+    serializer_class = RoomListSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsSuperOrReadOnly]
 
 class RoomDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Room details:
+    nested list of Reservations details
+    """
     queryset = Room.objects.all()
-    serializer_class = RoomSerializer
+    serializer_class = RoomDetailSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsSuperOrReadOnly]
