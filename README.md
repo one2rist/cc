@@ -4,7 +4,7 @@ Company needs an internal service for its employees which helps them to reserve 
 meeting rooms for internal or external meetings. Each employee should be able to check each
 room’s availability, book or cancel a reservation through an API.
 
-# Requirements for implementation:
+## Requirements for implementation:
 * There should be an API for:
     * Get meeting room reservations
     * Create reservation(Reservation has title, from and to dates, employees)
