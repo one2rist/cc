@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User
-from django.db.utils import IntegrityError
 from django.urls import reverse
 
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from reservation.models import Room, Reservation
+
 
 class RoomReservationsTests(APITestCase):
     def setUp(self):
@@ -32,25 +32,25 @@ class RoomReservationsTests(APITestCase):
         Get meeting rooms list
         """
 
-        #get list of rooms:
+        # get list of rooms:
         url = reverse('rooms')
         responce = self.client.get(url, format='json')
         self.assertEqual(responce.status_code, status.HTTP_200_OK)
         self.assertEqual(len(responce.data), 2)
-        #print(responce.data)
+        # print(responce.data)
 
     def test_get_meeting_room_reservations(self):
         """
         Get meeting room reservations
         """
 
-        #get room 2:
+        # get room 2:
         r1 = Room.objects.get(title='Room 1')
         url = reverse('room', args=(r1.pk,))
         responce = self.client.get(url, format='json')
         self.assertEqual(responce.status_code, status.HTTP_200_OK)
         self.assertEqual(len(responce.data['reservations']), 1)
-        #print(responce.data)
+        # print(responce.data)
 
     def test_create_reservations(self):
         """
@@ -58,10 +58,8 @@ class RoomReservationsTests(APITestCase):
         Reservation has title, from and to dates, employees
         """
 
-
         r1 = Room.objects.get(title='Room 1')
         u1 = User.objects.get(username='admin')
-        u2 = User.objects.get(username='Joahn')
         data = {
             'title': 'Booking 1',
             'room': r1.pk,
@@ -73,12 +71,12 @@ class RoomReservationsTests(APITestCase):
         self.client.force_authenticate(user=u1)
         url = reverse('reservations')
 
-        #posting not overlapping reservation:
+        # posting not overlapping reservation:
         responce = self.client.post(url, data, format='json')
         self.assertEqual(responce.status_code, status.HTTP_201_CREATED)
 
-        #posting overlapping reservation:
-        #same is in setUp()
+        # posting overlapping reservation:
+        # same is in setUp()
         data.update({
             'start': '2022-01-01T01:00:00Z',
             'end': '2022-01-01T02:00:00Z',
@@ -98,16 +96,16 @@ class RoomReservationsTests(APITestCase):
 
         url = reverse('reservation-detail', args=(b1.pk, ))
 
-        #anonymous user gets 403:
+        # anonymous user gets 403:
         responce = self.client.delete(url, format='json')
         self.assertEqual(responce.status_code, status.HTTP_403_FORBIDDEN)
 
-        #not organizer user gets 403:
+        # not organizer user gets 403:
         self.client.force_authenticate(user=u2)
         responce = self.client.delete(url, format='json')
         self.assertEqual(responce.status_code, status.HTTP_403_FORBIDDEN)
 
-        #organizer can delete:
+        # organizer can delete:
         self.client.force_authenticate(user=u1)
         responce = self.client.delete(url, format='json')
         self.assertEqual(responce.status_code, status.HTTP_204_NO_CONTENT)

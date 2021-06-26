@@ -11,6 +11,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
             return True
         return obj.organizer == request.user
 
+
 class IsSuperOrReadOnly(permissions.BasePermission):
     """
     Custom permission to only allow superuser to create/update the object.

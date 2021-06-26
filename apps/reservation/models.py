@@ -5,6 +5,7 @@ class Room(models.Model):
     title = models.CharField(max_length=127, blank=True, default='')
     description = models.TextField(blank=True, default='')
 
+
 class Reservation(models.Model):
     title = models.CharField(max_length=127, blank=True, default='')
     start = models.DateTimeField()

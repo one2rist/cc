@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 
 from rest_framework import generics
 from rest_framework import permissions
-from rest_framework import renderers
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -16,7 +15,6 @@ from reservation.serializers import UserListSerializer, UserDetailSerializer
 from reservation.serializers import RoomDetailSerializer, RoomListSerializer
 
 
-
 @api_view(['GET'])
 def home(request, format=None):
     return Response({
@@ -24,6 +22,7 @@ def home(request, format=None):
         'reservations': reverse('reservations', request=request, format=format),
         'rooms': reverse('rooms', request=request, format=format),
     })
+
 
 class ReservationList(generics.ListCreateAPIView):
     """
@@ -55,6 +54,7 @@ class ReservationList(generics.ListCreateAPIView):
             )
         serializer.save(organizer=self.request.user)
 
+
 class ReservationDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Reservation details:
@@ -64,7 +64,8 @@ class ReservationDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def _conflicting(self, data):
         instance = self.get_object()
@@ -76,7 +77,7 @@ class ReservationDetail(generics.RetrieveUpdateDestroyAPIView):
             end__gt=start,
             room=room,
         ).exclude(
-            pk=instance.pk #remove self
+            pk=instance.pk  # remove self
         ).exists()
 
     def perform_update(self, serializer):
@@ -95,6 +96,7 @@ class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserListSerializer
 
+
 class UserDetail(generics.RetrieveAPIView):
     """
     Employee details:
@@ -103,6 +105,7 @@ class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserDetailSerializer
 
+
 class RoomList(generics.ListCreateAPIView):
     """
     List of Rooms:
@@ -110,7 +113,9 @@ class RoomList(generics.ListCreateAPIView):
     """
     queryset = Room.objects.all()
     serializer_class = RoomListSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsSuperOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly, IsSuperOrReadOnly]
+
 
 class RoomDetail(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -119,4 +124,5 @@ class RoomDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Room.objects.all()
     serializer_class = RoomDetailSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsSuperOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly, IsSuperOrReadOnly]
