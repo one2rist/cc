@@ -80,3 +80,11 @@ http -a super:1 DELETE http://127.0.0.1:8000/api/reservations/1/
 ```
 
 Or test in [WEB-API](http://localhost:8000/api)
+
+## Docker
+```bash
+docker run -it -p 80:8020 \
+-e DJANGO_SUPERUSER_USERNAME=admin \
+-e DJANGO_SUPERUSER_PASSWORD=sekret1 \
+-e DJANGO_SUPERUSER_EMAIL=admin@example.com \
+one2rist/cc:cc
