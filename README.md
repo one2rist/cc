@@ -4,6 +4,19 @@ Company needs an internal service for its employees which helps them to reserve 
 meeting rooms for internal or external meetings. Each employee should be able to check each
 room’s availability, book or cancel a reservation through an API.
 
+# Requirements for implementation:
+* There should be an API for:
+    * Get meeting room reservations
+    * Create reservation(Reservation has title, from and to dates, employees)
+    * Cancel reservation
+* It’s assumed that these APIs will be with public access
+* Reasonable amount of automated tests
+* Solution should be uploaded to version control
+* Solution should be built using: Django and Python3, Django Rest Framework, SQL
+* tabase of your choice (PostgreSQL, SQLite, MySQL, etc)
+* PEP8 rules must be followed. Additional linters are welcomed (PyLint, Flake8)
+* Project README.md must be created with launch instructions
+
 ## Installation
 
 
