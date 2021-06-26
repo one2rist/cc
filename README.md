@@ -82,6 +82,7 @@ http -a super:1 DELETE http://127.0.0.1:8000/api/reservations/1/
 Or test in [WEB-API](http://localhost:8000/api)
 
 ## Docker
+built with nginx/gunicorn, so it is better to run on port 80 in order to make hyperlinks work properly:
 ```bash
 docker run -it -p 80:8020 \
 -e DJANGO_SUPERUSER_USERNAME=admin \
